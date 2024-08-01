@@ -161,7 +161,7 @@
 			if (transformations[input]) {
 				const name = transformations[input];
 				const suffix = specialCases.includes(input) ? "기념일" : "생일";
-				return `${name}${suffix}`;
+				return ` ${name}${suffix}`;
 			}
 			return "" ;
 		}
@@ -194,7 +194,7 @@
                 const 유닛 = transformUnit(row.querySelector('input[name="유닛"]').value);
                 const 기타 = transformName(row.querySelector('input[name="기타"]').value);
 
-                result += `<p><b>${화}화 [<a href="https://m.dcinside.com/board/pjsekai/${주소}">${제목}</a>] ${유닛} ${기타}</b></p>\n`;
+                result += `<p><b>${화}화 [<a href="https://m.dcinside.com/board/pjsekai/${주소}">${제목}</a>] ${유닛}${기타}</b></p>\n`;
             });
 
             document.getElementById('output').innerText = result.trim();
