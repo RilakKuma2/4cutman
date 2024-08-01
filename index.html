@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Generator</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			background-color: #f4f4f4;
+			margin: 0;
+			padding: 20px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+		}
+		.container {
+			background-color: white;
+			border-radius: 10px;
+			padding: 20px;
+			box-shadow: 0 0 10px rgba(0,0,0,0.1);
+			width: 100%;
+			max-width: 1000px;
+		}
+		h1 {
+			color: #333;
+			text-align: center;
+		}
+		table {
+			width: 100%;
+			margin: 0px 0;
+			border-collapse: collapse;
+		}
+		th, td {
+			padding: 10px;
+			border: 1px solid #ddd;
+			text-align: center;
+		}
+		th {
+			background-color: #f2f2f2;
+		}
+		input[type="text"] {
+			width: 100%; /* 셀의 크기에 따라 가변적으로 조정 */
+			box-sizing: border-box; /* 패딩과 보더를 포함하여 크기를 조절 */
+		}
+		button {
+			padding: 10px 20px;
+			margin: 5px;
+			border: none;
+			background-color: #28a745;
+			color: white;
+			cursor: pointer;
+			border-radius: 5px;
+		}
+		button:hover {
+			background-color: #218838;
+		}
+		.buttons {
+			text-align: center;
+			margin-top: 20px;
+		}
+		.output {
+			width: 100%;
+			background-color: white;
+			padding: 10px;
+			margin: 20px 0;
+			border: 1px solid #ddd;
+			white-space: pre-wrap;
+			word-wrap: break-word;
+		}
+	</style>
+</head>
+<body>
+    <div class="container">
+        <h1>텍스트 생성기</h1>
+        <table id="inputTable">
+            <thead>
+                <tr>
+                    <th>화</th>
+                    <th>주소</th>
+                    <th>제목</th>
+                    <th>유닛</th>
+                    <th>기타</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="inputRows">
+                <tr>
+                    <td><input type="text" name="화"></td>
+                    <td><input type="text" name="주소"></td>
+                    <td><input type="text" name="제목"></td>
+                    <td><input type="text" name="유닛"></td>
+                    <td><input type="text" name="기타"></td>
+                    <td><button onclick="addRow()">+</button></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="buttons">
+            <button onclick="generateText()">텍스트 생성</button>
+            <button onclick="copyToClipboard()">클립보드에 복사</button>
+        </div>
+        <div class="output" id="output"></div>
+    </div>
+    <script>
+        function extractFirst4DigitNumber(text) {
+            const match = text.match(/\d{4,}/);
+            return match ? match[0] : '';
+        }
+
+		function transformUnit(unit) {
+			const transformations = [
+				{ keyword: "버", replacement: '<span style="color:rgb(55,203,181);">버싱</span>' },
+				{ keyword: "레", replacement: '<span style="color:rgb(68,85,221);">레오니</span>' },
+				{ keyword: "모", replacement: '<span style="color:rgb(136,221,68);">모모점</span>' },
+				{ keyword: "비", replacement: '<span style="color:rgb(238,17,102);">비배스</span>' },
+				{ keyword: "원", replacement: '<span style="color:rgb(255,153,0);">원더쇼</span>' },
+				{ keyword: "니", replacement: '<span style="color:rgb(136,68,153);">니고</span>' }
+			];
+
+			transformations.forEach(transformation => {
+				const regex = new RegExp(`${transformation.keyword}(?!<)`, "g");
+				unit = unit.replace(regex, transformation.replacement);
+			});
+
+			return unit;
+		}
+
+		function transformName(input) {
+			const transformations = {
+				'이치': "이치카",
+				'시즈': "시즈쿠",
+				'아키': "아키토",
+				'츠카': "츠카사",
+				'미즈': "미즈키",
+				'메이': "메이코",
+				'사키': "사키",
+				'미노': "미노리",
+				'토우': "토우야",
+				'루이': "루이",
+				'에나': "에나",
+				'카이': "카이토",
+				'호나': "호나미",
+				'아이': "아이리",
+				'안': "안",
+				'네네': "네네",
+				'카나': "카나데",
+				'미쿠': "미쿠",
+				'시호': "시호",
+				'하루': "하루카",
+				'코하': "코하네",
+				'에무': "에무",
+				'마후': "마후유",
+				'린': "린",
+				'렌': "렌",
+				'루카': "루카"
+			};
+
+			const specialCases = ['카이', '미쿠', '메이', '린', '렌', '루카'];
+
+			if (transformations[input]) {
+				const name = transformations[input];
+				const suffix = specialCases.includes(input) ? "기념일" : "생일";
+				return `${name}${suffix}`;
+			}
+			return "" ;
+		}
+
+
+        function addRow() {
+            const table = document.getElementById('inputRows');
+            const lastRow = table.lastElementChild;
+            const newRow = lastRow.cloneNode(true);
+
+            const 화Input = lastRow.querySelector('input[name="화"]');
+            const 화Value = 화Input.value ? parseInt(화Input.value) + 1 : '';
+
+            newRow.querySelectorAll('input').forEach(input => input.value = '');
+            newRow.querySelector('input[name="화"]').value = 화Value;
+            newRow.querySelector('button').onclick = addRow;
+            table.appendChild(newRow);
+
+            lastRow.querySelector('button').remove();
+        }
+
+        function generateText() {
+            const table = document.getElementById('inputRows');
+            let result = '';
+
+            table.querySelectorAll('tr').forEach(row => {
+                const 화 = row.querySelector('input[name="화"]').value;
+                const 주소 = extractFirst4DigitNumber(row.querySelector('input[name="주소"]').value);
+                const 제목 = row.querySelector('input[name="제목"]').value;
+                const 유닛 = transformUnit(row.querySelector('input[name="유닛"]').value);
+                const 기타 = transformName(row.querySelector('input[name="기타"]').value);
+
+                result += `<p><b>${화}화 [<a href="https://m.dcinside.com/board/pjsekai/${주소}">${제목}</a>] ${유닛} ${기타}</b></p>\n`;
+            });
+
+            document.getElementById('output').innerText = result.trim();
+        }
+
+        function copyToClipboard() {
+            const output = document.getElementById('output').innerText;
+            navigator.clipboard.writeText(output).then(() => {
+                console.log('Text copied to clipboard');
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
